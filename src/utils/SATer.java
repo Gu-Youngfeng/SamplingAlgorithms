@@ -20,39 +20,7 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.ModelIterator;
 
-public class SATer {
-
-	public static void main(String[] args) {
-		
-//		List<String> config_1st = obtainFirstConfiguration("file/jhipster-3.6.1.dimacs");
-//		System.out.println(config_1st);
-//		System.out.println("------------");
-		
-//		List<List<String>> configs = obtainAllConfigurations("file/jhipster-3.6.1.dimacs");
-//		for(List<String> config: configs) System.out.println(config);
-//		System.out.println("------------");
-//		System.out.println("size:" + configs.size());
-		
-//		List<String> config_sel = obtainRandomConfiguration("file/jhipster-3.6.1.dimacs");
-//		System.out.println(config_sel);
-//		System.out.println("------------");
-		
-//		List<List<String>> configs = getOneEnabledConfig("file/jhipster-3.6.1.dimacs");
-//		for(List<String> config: configs) System.out.println(config);
-//		System.out.println("------------");
-//		System.out.println("size:" + configs.size());
-		
-//		List<List<String>> configs = getOneDisabledConfig("file/jhipster-3.6.1.dimacs");
-//		for(List<String> config: configs) System.out.println(config);
-//		System.out.println("------------");
-//		System.out.println("size:" + configs.size()); 
-	
-		List<List<String>> configs = getAllOneDisabledConfig("file/jhipster-3.6.1.dimacs");
-		for(List<String> config: configs) System.out.println(config);
-		System.out.println("------------");
-		System.out.println("size:" + configs.size());
-	}
-	
+public class SATer {	
 	
 	/***
 	 * <p>To obtain the 1-st valid configuration that satisfied the constraints from the cnf file. </p>
@@ -484,27 +452,31 @@ public class SATer {
 		
 		for(int i=2; i<=nVars; i++){
 			int[] clause = {-i}; // from the 2nd feature
-			
-			List<int[]> models = getAllMostEnabled(path, clause); // TODO: split configurations
+//			System.out.println("[disabled]:" + features.get(i-1));
+			List<int[]> models = getAllMostEnabled(path, clause); 
 			
 			if(models.size() == 0){
 				System.out.println("The feature " + features.get(i-1) + " cannot be enabled!");
 			}else{
-				List<String> config = new ArrayList<String>(); // valid configuration
+				
 				if(features.size() != models.get(0).length){
 					System.out.println("Feature inconsistent. " + path);
 					return null;
 				}	
 				for(int[] model: models){
+//					int count = 0;
+					List<String> config = new ArrayList<String>(); // valid configuration
 					for(int k=0; k<model.length; k++){ // each configuration
 						if(model[k] < 0){ 
 							config.add("!"+features.get(k));
+//							count++;
 						}
 						else{
 							config.add(features.get(k));
 						}
 					}
 					configs.add(config);
+//					System.out.println("[disabled]:" + count);
 				}
 			}
 			
@@ -546,17 +518,140 @@ public class SATer {
 				
 				try{
 					solver.addAtLeast(v, (n-1)); // at most 2
+					solver.addClause(new VecInt(clause)); // let the i-th features to be disabled
+				}catch(Exception e){
+					continue;
+				}
+				
+				int[] model = null;
+				while(problem.isSatisfiable()){
+					model = problem.model();
+					models.add(model);
+//					System.out.println("[n]:" + n);
+//					break;
+				}
+				
+				if(model != null){
+					break;
+				}
+				
+			}
+		} catch (ParseFormatException e) {
+			System.out.println("CNF convertion Failed! " + path);
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("Open CNF Failed! " + path);
+			e.printStackTrace();
+		} catch (ContradictionException e) {
+			System.out.println("Contradiction Exception! " + path);
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			System.out.println("SAT Timeout! " + path);
+			e.printStackTrace();
+		}
+		
+		return models;	
+	}
+	
+	
+	/***
+	 * <p>To obtain the all-one-enabled samples with the constraints. <br>
+	 * Note that, for each feature we disable the most of other features and return all the possible configurations. </p>
+	 * @param path cnf file
+	 * @return samples list
+	 */
+	public static List<List<String>> getAllOneEnabledConfig(String path){
+		
+		List<List<String>> configs = new ArrayList<>();
+		
+		List<String> features = obtainFeature(path);
+		int nVars = features.size(); // number of features
+		
+		for(int i=2; i<=nVars; i++){
+			int[] clause = {i}; // from the 2nd feature
+//			System.out.println("[disabled]:" + features.get(i-1));
+			List<int[]> models = getAllMostDisabled(path, clause); 
+			
+			if(models.size() == 0){
+				System.out.println("The feature " + features.get(i-1) + " cannot be enabled!");
+			}else{
+				
+				if(features.size() != models.get(0).length){
+					System.out.println("Feature inconsistent. " + path);
+					return null;
+				}	
+				for(int[] model: models){
+//					int count = 0;
+					List<String> config = new ArrayList<String>(); // valid configuration
+					for(int k=0; k<model.length; k++){ // each configuration
+						if(model[k] < 0){ 
+							config.add("!"+features.get(k));
+//							count++;
+						}
+						else{
+							config.add(features.get(k));
+						}
+					}
+					configs.add(config);
+//					System.out.println("[disabled]:" + count);
+				}
+			}
+			
+//			break;
+		}
+		
+		return configs;
+	}
+	
+	
+	/***
+	 * <p>enable one feature and disable the most of other features. </p>
+	 * @param path cnf file
+	 * @param clause enabled feature
+	 * @return sat model
+	 */
+	public static List<int[]> getAllMostDisabled(String path, int[] clause){
+		
+		List<int[]> models = new ArrayList<int[]>();	// sat model	
+		ISolver solver = SolverFactory.newDefault();
+		solver.setTimeout(3600);		
+		ModelIterator mi =  new ModelIterator(solver); ///
+		Reader reader = new InstanceReader(mi); ///
+		
+		try {		
+			IProblem problem = reader.parseInstance(path);
+			for(int n=1; n<problem.nVars(); n++){
+				
+				solver = SolverFactory.newDefault();
+				mi =  new ModelIterator(solver); ///
+				reader = new InstanceReader(mi); ///
+				problem = reader.parseInstance(path);
+			
+				VecInt v = new VecInt();
+				for(int i=1; i<=problem.nVars(); i++){
+					v.push(i);
+				}
+//				System.out.println("[n]:" + n + "[v]:" + v.size());
+				
+				try{
+					solver.addAtMost(v, (n+1)); // at most 2
 					solver.addClause(new VecInt(clause)); // let the i-th features to be enabled
 				}catch(Exception e){
 					continue;
 				}
 				
+				int[] model = null;
 				while(problem.isSatisfiable()){
-					int[] model = problem.model();
+					model = problem.model();
 					models.add(model);
 //					System.out.println("[n]:" + n);
+//					break;
+				}
+				
+				if(model != null){
 					break;
-				}			
+				}
+				
 			}
 		} catch (ParseFormatException e) {
 			System.out.println("CNF convertion Failed! " + path);
