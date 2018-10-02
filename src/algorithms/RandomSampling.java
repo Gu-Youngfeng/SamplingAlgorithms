@@ -19,7 +19,7 @@ public class RandomSampling {
 		
 		configs = new ArrayList<>();
 		List<List<String>> configs_all = SATer.obtainAllConfigurations(path); // all valid configurations
-		System.out.println("[size]" + configs_all.size());
+//		System.out.println("[size]" + configs_all.size());
 		int[] lsIDs = returnRandList(configs_all.size(), num);
 		
 		for(int i=0; i<lsIDs.length; i++){

@@ -2,6 +2,7 @@ package experiments;
 
 import java.util.List;
 
+import algorithms.AllMostEnabledDisabledSampling;
 import algorithms.AllOneDisabledSampling;
 import algorithms.AllOneEnabledSampling;
 import algorithms.OneDisabledSampling;
@@ -41,11 +42,18 @@ public class comparison {
 		System.out.println("size:" + configs_aoes.size());
 		
 		/** random sampling */
-		RandomSampling rs = new RandomSampling("file/jhipster-3.6.1.dimacs", 5);
+		RandomSampling rs = new RandomSampling("file/jhipster-3.6.1.dimacs", 8);
 		List<List<String>> config_rd = rs.getSamples();
 		for(List<String> config: config_rd) System.out.println(config);
 		System.out.println("------------");
 		System.out.println("size:" + config_rd.size());
+		
+		/** All-most-enabled-disabled sampling */
+		AllMostEnabledDisabledSampling ameds = new AllMostEnabledDisabledSampling("file/jhipster-3.6.1.dimacs");
+		List<List<String>> config_ameds = ameds.getSamples();
+		for(List<String> config: config_ameds) System.out.println(config);
+		System.out.println("------------");
+		System.out.println("size:" + config_ameds.size());
 
 	}
 

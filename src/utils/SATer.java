@@ -353,7 +353,7 @@ public class SATer {
 			int[] model = getMostEnabled(path, clause);
 			
 			if(model == null){
-				System.out.println("The feature " + features.get(i-1) + " cannot be enabled!");
+				System.out.println("The feature " + features.get(i-1) + " cannot be disabled!");
 			}else{
 				List<String> config = new ArrayList<String>(); // valid configuration
 				if(features.size() != model.length){
@@ -456,7 +456,7 @@ public class SATer {
 			List<int[]> models = getAllMostEnabled(path, clause); 
 			
 			if(models.size() == 0){
-				System.out.println("The feature " + features.get(i-1) + " cannot be enabled!");
+				System.out.println("The feature " + features.get(i-1) + " cannot be disabled!");
 			}else{
 				
 				if(features.size() != models.get(0).length){
@@ -670,5 +670,62 @@ public class SATer {
 		return models;	
 	}
 	
+	
+	public static List<List<String>> getAllMostEnabledDisabledConfig(String path){
+		List<List<String>> configs = obtainAllConfigurations(path);
+		List<List<String>> configs_sel = new ArrayList<>();
+		
+		int count_enabled;
+		int most_enabled = 0;
+		int least_enabled = 0;
+		
+		for(int i=0; i<configs.size(); i++){ // for each configuration
+			count_enabled = countEnabled(configs.get(i));
+			
+			if(count_enabled > most_enabled){ // configurations with the most disabled features
+				most_enabled = count_enabled;
+			}
+		}
+		
+		least_enabled = configs.get(0).size();
+		
+		for(int i=0; i<configs.size(); i++){ // for each configuration
+			count_enabled = countEnabled(configs.get(i));
+			
+			if(count_enabled < least_enabled){ // configurations with the most enabled features
+				least_enabled = count_enabled;
+			}
+		}
+		
+		System.out.println("[most_enabled]:" + most_enabled);
+		System.out.println("[least_enabled]:" + least_enabled);
+		
+		for(int i=0; i<configs.size(); i++){ // for each configuration
+			count_enabled = countEnabled(configs.get(i));
+			if(count_enabled == most_enabled || count_enabled == least_enabled){
+				configs_sel.add(configs.get(i));
+			}
+		}
+		
+		return configs_sel;
+	}	
+	
+	/***
+	 * <p>To obtain the number of enabled features of the configuration. </p>
+	 * @param config configuration
+	 * @return number of enabled features
+	 */
+	public static int countEnabled(List<String> config){
+		int num_enabled = 0;
+		
+		for(String option: config){
+			if(!option.startsWith("!")){
+				num_enabled++;				
+			}
+		}
+		
+		return num_enabled;
+			
+	}
 	
 }
