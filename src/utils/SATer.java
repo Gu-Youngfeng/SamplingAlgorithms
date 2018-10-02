@@ -671,6 +671,11 @@ public class SATer {
 	}
 	
 	
+	/***
+	 * <p>To obtain all the configurations satisfy the most-enabled-disabled constraints. </p>
+	 * @param path cnf file
+	 * @return configurations list
+	 */
 	public static List<List<String>> getAllMostEnabledDisabledConfig(String path){
 		List<List<String>> configs = obtainAllConfigurations(path);
 		List<List<String>> configs_sel = new ArrayList<>();
@@ -697,8 +702,8 @@ public class SATer {
 			}
 		}
 		
-		System.out.println("[most_enabled]:" + most_enabled);
-		System.out.println("[least_enabled]:" + least_enabled);
+//		System.out.println("[most_enabled]:" + most_enabled);
+//		System.out.println("[least_enabled]:" + least_enabled);
 		
 		for(int i=0; i<configs.size(); i++){ // for each configuration
 			count_enabled = countEnabled(configs.get(i));
@@ -709,6 +714,7 @@ public class SATer {
 		
 		return configs_sel;
 	}	
+	
 	
 	/***
 	 * <p>To obtain the number of enabled features of the configuration. </p>
@@ -726,6 +732,44 @@ public class SATer {
 		
 		return num_enabled;
 			
+	}
+	
+	
+	/***
+	 * <p>To read configurations based on {@link CSVReader}, which reads configuration from csv result. </p>
+	 * @param path cnf file
+	 * @param strength value of T
+	 * @return configurations list
+	 */
+	public static List<List<String>> getTWiseConfig(String path, int strength){
+	
+		String csv_result = "";
+		//TODO: complete the T-wise csv results 
+		switch(strength){
+		case 1:
+			csv_result = ""; // 1-wise
+			break;
+		case 2:
+			csv_result = ""; // 2-wise
+			break;
+		case 3:
+			csv_result = ""; // 3-wise
+			break;
+		case 4:
+			csv_result = ""; // 4-wise
+			break;
+		default:
+			csv_result = ""; // 2-wise
+			System.out.print("T=1,2,3,4");
+			break;
+			
+		}
+		
+		CSVReader reader = new CSVReader(csv_result); // read from csv result
+		List<List<String>> configs_sel = reader.configs;
+		
+		return configs_sel;
+
 	}
 	
 }
