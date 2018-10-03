@@ -736,6 +736,60 @@ public class SATer {
 	
 	
 	/***
+	 * <p>To obtain all the configurations satisfy the most-enabled-disabled constraints. </p>
+	 * @param path cnf file
+	 * @return configurations list
+	 */
+	public static List<List<String>> getMostEnabledDisabledConfig(String path){
+		List<List<String>> configs = obtainAllConfigurations(path);
+		List<List<String>> configs_sel = new ArrayList<>();
+		
+		int count_enabled;
+		int most_enabled = 0;
+		int least_enabled = 0;
+		
+		for(int i=0; i<configs.size(); i++){ // for each configuration
+			count_enabled = countEnabled(configs.get(i));
+			
+			if(count_enabled > most_enabled){ // configurations with the most disabled features
+				most_enabled = count_enabled;
+			}
+		}
+		
+		least_enabled = configs.get(0).size();
+		
+		for(int i=0; i<configs.size(); i++){ // for each configuration
+			count_enabled = countEnabled(configs.get(i));
+			
+			if(count_enabled < least_enabled){ // configurations with the most enabled features
+				least_enabled = count_enabled;
+			}
+		}
+		
+//		System.out.println("[most_enabled]:" + most_enabled);
+//		System.out.println("[least_enabled]:" + least_enabled);
+		
+		for(int i=0; i<configs.size(); i++){ // for each configuration
+			count_enabled = countEnabled(configs.get(i));
+			if(count_enabled == most_enabled){
+				configs_sel.add(configs.get(i)); // first most-enabled
+				break;
+			}
+		}
+		
+		for(int i=0; i<configs.size(); i++){ // for each configuration
+			count_enabled = countEnabled(configs.get(i));
+			if(count_enabled == least_enabled){
+				configs_sel.add(configs.get(i)); // first most-disabled
+				break;
+			}
+		}
+		
+		return configs_sel;
+	}
+	
+	
+	/***
 	 * <p>To read configurations based on {@link CSVReader}, which reads configuration from csv result. </p>
 	 * @param path cnf file
 	 * @param strength value of T
@@ -747,20 +801,20 @@ public class SATer {
 		//TODO: complete the T-wise csv results 
 		switch(strength){
 		case 1:
-			csv_result = ""; // 1-wise
+			csv_result = "file/jhipster.dimacs.ca1.icpl.csv"; // 1-wise
 			break;
 		case 2:
-			csv_result = ""; // 2-wise
+			csv_result = "file/jhipster.dimacs.ca2.icpl.csv"; // 2-wise
 			break;
 		case 3:
-			csv_result = ""; // 3-wise
+			csv_result = "file/jhipster.dimacs.ca3.icpl.csv"; // 3-wise
 			break;
 		case 4:
-			csv_result = ""; // 4-wise
+			csv_result = "file/jhipster.dimacs.ca4.chvatal.csv"; // 4-wise, icpl algorithm have cannot support 4 -wise sampling
 			break;
 		default:
-			csv_result = ""; // 2-wise
-			System.out.print("T=1,2,3,4");
+			csv_result = "file/jhipster.dimacs.ca2.icpl.csv"; // 2-wise
+			System.out.print("Illegal parameter for Strength. T=1,2,3,4");
 			break;
 			
 		}

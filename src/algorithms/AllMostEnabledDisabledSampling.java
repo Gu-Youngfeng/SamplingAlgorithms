@@ -7,10 +7,8 @@ import utils.SATer;
 /***
  * <p><b>All-most-enabled-disabled</b> collects 2 kinds of configurations 
  * which either has the most enabled features or has the most disabled features.</p>
- * <p>For features A, B, C and D we can get 2 samples like that, </p>
- * <pre> [!A, !B, !C, !D]
- * [A, B, C, D]
- * </pre>
+ * <p>Note: **All-most-enabled-disabled** strategy differs from **Most-enabled-disabled** strategy that 
+ * the former collects all valid configurations while the latter only obtains the first satisfied one.</p>
  *
  */
 public class AllMostEnabledDisabledSampling {
