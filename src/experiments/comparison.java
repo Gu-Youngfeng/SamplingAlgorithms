@@ -5,6 +5,7 @@ import java.util.List;
 import algorithms.AllMostEnabledDisabledSampling;
 import algorithms.AllOneDisabledSampling;
 import algorithms.AllOneEnabledSampling;
+import algorithms.DissimilaritySampling;
 import algorithms.MostEnabledDisabledSampling;
 import algorithms.OneDisabledSampling;
 import algorithms.OneEnabledSampling;
@@ -70,6 +71,13 @@ public class comparison {
 		for(List<String> config: config_tws) System.out.println(config);
 		System.out.println("------------");
 		System.out.println("size:" + config_tws.size());
+		
+		/** T-wise sampling */
+		DissimilaritySampling ds = new DissimilaritySampling("file/jhipster.pledge.40", 40); // conduct dissimilarity sampling
+		List<List<String>> config_ds = ds.getSamples();
+		for(List<String> config: config_ds) System.out.println(config);
+		System.out.println("------------");
+		System.out.println("size:" + config_ds.size());
 
 	}
 

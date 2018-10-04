@@ -790,7 +790,7 @@ public class SATer {
 	
 	
 	/***
-	 * <p>To read configurations based on {@link CSVReader}, which reads configuration from csv result. </p>
+	 * <p>To read configurations based on {@link CSVReader}, which reads configuration from <b>SPLCAT</b> tool. </p>
 	 * @param path cnf file
 	 * @param strength value of T
 	 * @return configurations list
@@ -798,7 +798,7 @@ public class SATer {
 	public static List<List<String>> getTWiseConfig(String path, int strength){
 	
 		String csv_result = "";
-		//TODO: complete the T-wise csv results 
+		 
 		switch(strength){
 		case 1:
 			csv_result = "file/jhipster.dimacs.ca1.icpl.csv"; // 1-wise
@@ -824,6 +824,24 @@ public class SATer {
 		
 		return configs_sel;
 
+	}
+	
+	
+	/***
+	 * <p>To read csv result based on {@linkPledgeReader}, which reads configurations from <b>PLEDGE</b> tool.</p>
+	 * @param path
+	 * @param num
+	 * @return
+	 */
+	public static List<List<String>> getDissimilarityConfig(String path, int num){
+		
+		String pledge_result = path;
+		
+		PledgeReader reader = new PledgeReader(pledge_result, num); // read from pledge result
+		List<List<String>> configs = reader.configs;
+
+		return configs;
+		
 	}
 	
 }
